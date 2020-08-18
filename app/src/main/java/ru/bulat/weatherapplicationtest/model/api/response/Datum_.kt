@@ -1,10 +1,7 @@
 package ru.bulat.weatherapplicationtest.model.api.response
 
 import com.google.gson.annotations.Expose
-
 import com.google.gson.annotations.SerializedName
-
-
 
 
 class Datum_ {
