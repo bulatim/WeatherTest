@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Погода.Тест</string>
+    <string name="list_weather">Списком</string>
+    <string name="map_weather">На карте</string>
+    <string name="st_petersburg">Санкт-Петербург</string>
+    <string name="moscow">Москва</string>
+</resources>
