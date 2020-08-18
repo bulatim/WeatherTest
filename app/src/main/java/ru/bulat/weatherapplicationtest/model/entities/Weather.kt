@@ -5,11 +5,11 @@ import androidx.room.PrimaryKey
 import java.util.*
 
 @Entity
-class Weather {
+data class Weather(
     @field:PrimaryKey(autoGenerate = true)
-    var id: Long? = null
-    var date: Date? = null
-    var latitude: Double = 0.0
-    var longtitude: Double = 0.0
+    var id: Long? = null,
+    var date: Date? = null,
+    var latitude: Double = 0.0,
+    var longtitude: Double = 0.0,
     var data: String = ""
-}
+)

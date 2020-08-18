@@ -7,10 +7,10 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import ru.bulat.weatherapplicationtest.BuildConfig
 import ru.bulat.weatherapplicationtest.di.scope.AppScope
 import ru.bulat.weatherapplicationtest.network.WeatherApi
 import ru.bulat.weatherapplicationtest.utils.BASE_URL
-import java.util.concurrent.TimeUnit
 
 
 @Module(includes = [ContextModule::class])
@@ -18,14 +18,13 @@ class NetworkModule {
     @AppScope
     @Provides
     internal fun provideOkHttpClient(): OkHttpClient {
-        val logging = HttpLoggingInterceptor()
-        logging.setLevel(HttpLoggingInterceptor.Level.BASIC)
-        return OkHttpClient().newBuilder()
-            .addInterceptor(logging)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .build()
+        val okHttpBuilder = OkHttpClient().newBuilder()
+        if (BuildConfig.DEBUG) {
+            val logging = HttpLoggingInterceptor()
+            logging.setLevel(HttpLoggingInterceptor.Level.BASIC)
+            okHttpBuilder.addInterceptor(logging)
+        }
+        return okHttpBuilder.build()
     }
 
     @AppScope

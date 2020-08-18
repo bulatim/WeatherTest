@@ -5,9 +5,6 @@ import kotlinx.coroutines.withContext
 import ru.bulat.weatherapplicationtest.model.dao.WeatherDao
 import ru.bulat.weatherapplicationtest.model.entities.Weather
 import ru.bulat.weatherapplicationtest.network.WeatherApi
-import java.time.LocalDate
-import java.time.Period
-import java.util.*
 import javax.inject.Inject
 
 class WeatherRepository @Inject

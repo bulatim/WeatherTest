@@ -9,11 +9,9 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
@@ -193,11 +191,7 @@ class MapWeatherFragment : BaseFragment(), OnMapReadyCallback {
                         }
                         permissionDialog.show()
                     } else
-                        Toast.makeText(
-                            requireContext(),
-                            "Доступ к определению местоположения запрещен",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        showToast("Доступ к определению местоположения запрещен")
                 }
                 return
             }
@@ -206,7 +200,7 @@ class MapWeatherFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    fun isUserCheckNeverAskAgain() =
+    private fun isUserCheckNeverAskAgain() =
         !ActivityCompat.shouldShowRequestPermissionRationale(
             requireActivity(),
             Manifest.permission.ACCESS_FINE_LOCATION
