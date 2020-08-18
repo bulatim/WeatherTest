@@ -9,6 +9,7 @@ import ru.bulat.weatherapplicationtest.model.api.response.WeatherResponse
 import ru.bulat.weatherapplicationtest.model.entities.Weather
 import ru.bulat.weatherapplicationtest.repository.WeatherRepository
 import ru.bulat.weatherapplicationtest.utils.fahrenheitToCelsius
+import java.net.UnknownHostException
 import java.util.*
 import javax.inject.Inject
 
@@ -24,6 +25,8 @@ open class BaseWeatherViewModel: ViewModel() {
     val loadingVisibilityProgress: MutableLiveData<Int> = MutableLiveData()
     val loadingVisibilityGroup: MutableLiveData<Int> = MutableLiveData()
 
+    val errorLiveData = MutableLiveData<String>()
+
     fun onStartLoading() {
         loadingVisibilityProgress.value = View.VISIBLE
         loadingVisibilityGroup.value = View.GONE
@@ -34,28 +37,37 @@ open class BaseWeatherViewModel: ViewModel() {
         loadingVisibilityGroup.postValue(View.VISIBLE)
     }
 
-    suspend fun loadWeatherByCoordinate(latitude: Double, longtitude: Double): WeatherResponse {
+    suspend fun loadWeatherByCoordinate(latitude: Double, longtitude: Double): WeatherResponse? {
         val weather = weatherRepository.getWeatherByCoordinateLocal(latitude, longtitude)
         val currentDate = Date()
-        val weatherResponse: WeatherResponse
+        var weatherResponse: WeatherResponse? = null
         if (weather == null || ((currentDate.time - weather.date!!.time) / (60 * 1000) > 60)) {
             if (weather != null)
                 weatherRepository.deleteWeatherById(weather.id!!)
-            weatherResponse =
-                weatherRepository.getWeatherByCoordinateCloude(latitude, longtitude).await()
-            weatherRepository.insertWeather(Weather().apply {
-                this.date = Date()
-                this.latitude = latitude
-                this.longtitude = longtitude
-                this.data = gson.toJson(weatherResponse)
-            })
+            try {
+                weatherResponse =
+                    weatherRepository.getWeatherByCoordinateCloude(latitude, longtitude).await()
+                weatherRepository.insertWeather(Weather().apply {
+                    this.date = Date()
+                    this.latitude = latitude
+                    this.longtitude = longtitude
+                    this.data = gson.toJson(weatherResponse)
+                })
+            } catch (e: Exception) {
+                when (e) {
+                    is UnknownHostException -> errorLiveData.value = "Ошибка. Проверьте наличие сети"
+                    else -> errorLiveData.value = "Неизвестная ошибка"
+                }
+                onFinishLoading()
+                e.printStackTrace()
+            }
         } else
             weatherResponse = gson.fromJson(weather.data, WeatherResponse::class.java)
 
-        weatherResponse.currently?.temperature?.let {
+        weatherResponse?.currently?.temperature?.let {
             currentTemperature.value = fahrenheitToCelsius(it)
         }
-        weatherResponse.currently?.icon?.let {
+        weatherResponse?.currently?.icon?.let {
             currentDescription.value = when (it) {
                 "clear-day" -> "ЯСНО"
                 "rain" -> "ДОЖДЬ"

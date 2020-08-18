@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -228,6 +229,10 @@ class MapWeatherFragment : BaseFragment(), OnMapReadyCallback {
                 parentFragmentManager,
                 WeatherDialog::class.java.simpleName
             )
+            viewModel.errorLiveData.observe(viewLifecycleOwner, Observer {
+                showToast(it)
+                weatherDialog.dismiss()
+            })
             viewModel.getWeatherByCoordinate(it.latitude, it.longitude)
         }
     }

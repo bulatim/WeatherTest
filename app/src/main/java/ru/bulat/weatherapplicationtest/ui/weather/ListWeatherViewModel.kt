@@ -13,7 +13,7 @@ class ListWeatherViewModel @Inject constructor(): BaseWeatherViewModel() {
         viewModelScope.launch {
             onStartLoading()
             val weatherResponse = loadWeatherByCoordinate(latitude, longtitude)
-            weatherResponse.daily?.data?.let {
+            weatherResponse?.daily?.data?.let {
                 dayWeatherListAdapter.updateDayWeatherList(it)
                 recyclerViewUpdateCallback.invoke()
             }
