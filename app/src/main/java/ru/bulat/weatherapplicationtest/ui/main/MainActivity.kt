@@ -1,5 +1,11 @@
 package ru.bulat.weatherapplicationtest.ui.main
 
+import android.content.Intent
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -19,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (supportFragmentManager.fragments.size == 0) {
+            createShortcuts()
+
             listWeatherFragment = ListWeatherFragment()
             mapWeatherFragment = MapWeatherFragment()
 
@@ -38,6 +46,10 @@ class MainActivity : AppCompatActivity() {
                 )
                 .commit()
             active = listWeatherFragment
+            if (intent.getStringExtra("action") == "map") {
+                showFragment(mapWeatherFragment)
+                bottom_nav.selectedItemId = R.id.map_weather
+            }
         } else {
             val activeFragment = savedInstanceState?.getString("activeFragment")
             supportFragmentManager.fragments.forEach {
@@ -54,21 +66,11 @@ class MainActivity : AppCompatActivity() {
         bottom_nav.setOnNavigationItemSelectedListener {
             return@setOnNavigationItemSelectedListener when (it.itemId) {
                 R.id.list_weather -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .hide(active)
-                        .show(listWeatherFragment)
-                        .commit()
-                    active = listWeatherFragment
+                    showFragment(listWeatherFragment)
                     true
                 }
                 R.id.map_weather -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .hide(active)
-                        .show(mapWeatherFragment)
-                        .commit()
-                    active = mapWeatherFragment
+                    showFragment(mapWeatherFragment)
                     true
                 }
                 else -> false
@@ -76,11 +78,67 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.slide_in, R.anim.fade_out)
+            .hide(active)
+            .show(fragment)
+            .commit()
+        active = fragment
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         supportFragmentManager.fragments.forEach {
             if (it.isVisible)
                 outState.putString("activeFragment", it.javaClass.simpleName)
+        }
+    }
+
+    private fun createShortcuts() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            val shortcutManager = getSystemService(
+                ShortcutManager::class.java
+            )
+
+            val listShortcut = ShortcutInfo.Builder(this, "shortcut_list")
+                .setShortLabel("Неделя")
+                .setLongLabel("Погода на неделю")
+                .setIcon(Icon.createWithResource(this, R.drawable.ic_view_list_black_24dp))
+                .setIntents(
+                    arrayOf(
+                        Intent(
+                            Intent.ACTION_MAIN,
+                            Uri.EMPTY,
+                            this,
+                            MainActivity::class.java
+                        ).setFlags(
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        ).putExtra("action", "list")
+                    )
+                )
+                .build()
+
+            val mapShortcut = ShortcutInfo.Builder(this, "shortcut_map")
+                .setShortLabel("На карте")
+                .setLongLabel("Погода на карте")
+                .setIcon(Icon.createWithResource(this, R.drawable.ic_map_black_24dp))
+                .setIntents(
+                    arrayOf(
+                        Intent(
+                            Intent.ACTION_MAIN,
+                            Uri.EMPTY,
+                            this,
+                            MainActivity::class.java
+                        ).setFlags(
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        ).putExtra("action", "map")
+                    )
+                )
+                .build()
+
+            shortcutManager?.dynamicShortcuts = listOf(listShortcut, mapShortcut)
         }
     }
 }
