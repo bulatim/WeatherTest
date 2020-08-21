@@ -21,7 +21,7 @@
             app:layout_constraintHorizontal_bias="0.92"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:load_image="@{viewModel.getImage()}"
+            app:load_image="@{viewModel.currentIconImage}"
             tools:srcCompat="@drawable/ic_navigation_black_24dp" />
 
         <TextView
@@ -34,7 +34,7 @@
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/imageView"
-            app:mutableText="@{viewModel.getCurrentTemperature()}"
+            app:mutableText="@{viewModel.currentTemperature}"
             tools:text="-1°C" />
 
         <TextView
@@ -48,7 +48,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView"
-            app:mutableText="@{viewModel.getCurrentDescription()}"
+            app:mutableText="@{viewModel.currentDescription}"
             tools:text="ЯСНО" />
 
         <ProgressBar

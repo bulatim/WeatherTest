@@ -14,6 +14,7 @@ import ru.bulat.weatherapplicationtest.R
 import ru.bulat.weatherapplicationtest.databinding.ListWeatherFragmentBinding
 import ru.bulat.weatherapplicationtest.base.BaseFragment
 
+
 class ListWeatherFragment : BaseFragment() {
     lateinit var binding: ListWeatherFragmentBinding
     lateinit var viewModel: ListWeatherViewModel

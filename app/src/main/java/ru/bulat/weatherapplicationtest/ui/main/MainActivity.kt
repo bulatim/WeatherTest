@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var listWeatherFragment: ListWeatherFragment
     lateinit var mapWeatherFragment: MapWeatherFragment
     lateinit var active: Fragment
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

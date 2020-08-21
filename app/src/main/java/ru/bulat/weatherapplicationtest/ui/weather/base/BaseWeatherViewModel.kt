@@ -4,21 +4,22 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import ru.bulat.weatherapplicationtest.R
 import ru.bulat.weatherapplicationtest.model.api.response.WeatherResponse
 import ru.bulat.weatherapplicationtest.model.entities.Weather
 import ru.bulat.weatherapplicationtest.repository.WeatherRepository
-import ru.bulat.weatherapplicationtest.utils.fahrenheitToCelsius
+import ru.bulat.weatherapplicationtest.utils.iconResource
+import ru.bulat.weatherapplicationtest.utils.iconString
+import ru.bulat.weatherapplicationtest.utils.temperatureCelsius
 import java.net.UnknownHostException
 import java.util.*
 import javax.inject.Inject
 
-open class BaseWeatherViewModel: ViewModel() {
+open class BaseWeatherViewModel : ViewModel() {
     @Inject
     lateinit var weatherRepository: WeatherRepository
     @Inject
     lateinit var gson: Gson
-    val image = MutableLiveData<Int>()
+    val currentIconImage = MutableLiveData<Int>()
     val currentTemperature = MutableLiveData<String>()
     val currentDescription = MutableLiveData<String>()
 
@@ -55,7 +56,8 @@ open class BaseWeatherViewModel: ViewModel() {
                 })
             } catch (e: Exception) {
                 when (e) {
-                    is UnknownHostException -> errorLiveData.value = "Ошибка. Проверьте наличие сети"
+                    is UnknownHostException -> errorLiveData.value =
+                        "Ошибка. Проверьте наличие сети"
                     else -> errorLiveData.value = "Неизвестная ошибка"
                 }
                 onFinishLoading()
@@ -64,25 +66,10 @@ open class BaseWeatherViewModel: ViewModel() {
         } else
             weatherResponse = gson.fromJson(weather.data, WeatherResponse::class.java)
 
-        weatherResponse?.currently?.temperature?.let {
-            currentTemperature.value = fahrenheitToCelsius(it)
-        }
-        weatherResponse?.currently?.icon?.let {
-            currentDescription.value = when (it) {
-                "clear-day" -> "ЯСНО"
-                "rain" -> "ДОЖДЬ"
-                "cloudy" -> "ОБЛАЧНО"
-                "partly-cloudy-day" -> "ПЕРЕМЕННАЯ ОБЛАЧНОСТЬ"
-                else -> "ЯСНО"
-            }
-            image.value = when(it) {
-                "clear-day" -> R.drawable.clearday
-                "rain" -> R.drawable.rain
-                "cloudy" -> R.drawable.cloudy
-                "partly-cloudy-day" -> R.drawable.partly_cloudy_day
-                else -> R.drawable.clearday
-            }
-        }
+        currentTemperature.value = weatherResponse?.currently?.temperatureCelsius()
+        currentDescription.value = weatherResponse?.currently?.iconString()
+        currentIconImage.value = weatherResponse?.currently?.iconResource()
+
         return weatherResponse
     }
 }
